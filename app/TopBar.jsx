@@ -15,7 +15,7 @@ export default function MyTabs() {
       <Tab.Screen
         name="Feed"
         component={HomeCarousel}
-        options={{ tabBarLabel: 'feed' }}
+        options={{ tabBarLabel: 'fee' }}
       />
        <Tab.Screen
         name="Feed1"
