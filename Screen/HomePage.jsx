@@ -60,7 +60,7 @@ export default function HomePage() {
           </MapView>
         {/* MapView */}
 
-          <View style={tw`absolute bottom-0 bg-white w-full rounded-t-[20px] h-[220px]`}>
+          <View style={tw`absolute bottom-0 bg-white w-full rounded-t-[20px] h-[230px]`}>
            < HomeCarousel/>
           </View>
     </View>

@@ -1,6 +1,6 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import MyParking from '../Screen/MyParking';
 import HomeCarousel from '../components/HomeCarousel.jsx'
+import tailwind from 'twrnc';
 const Tab = createMaterialTopTabNavigator();
 
 export default function MyTabs() {
@@ -9,13 +9,13 @@ export default function MyTabs() {
       initialRouteName="Feed"
       screenOptions={{
         tabBarActiveTintColor: '#e91e63',
-        tabBarLabelStyle: { fontSize: 12 },
+        tabBarLabelStyle: { fontSize: 12 , }, 
       }}
     >
       <Tab.Screen
         name="Feed"
         component={HomeCarousel}
-        options={{ tabBarLabel: 'fee' }}
+        options={{ tabBarLabel: 'feed',  }}
       />
        <Tab.Screen
         name="Feed1"
