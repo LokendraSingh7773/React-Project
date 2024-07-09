@@ -24,25 +24,26 @@ export default function TabViewExample() {
   const [stationsData, setStationData] = useState([]);
 
   const getStationData = async (vehicle_type, lat, long) => {
-    axios
-      .post("https://parkvue.microcrm.in/api/parking-stations", {
-        customer_id: 0,
-        vehicle_type: vehicle_type,
-        latitude: lat,
-        longitude: long,
-        green_pass: "no",
-      })
-      .then((res) => {
-        console.log(res.data);
-        const { status_code, message, centerList } = res.data;
+    try {
+      axios
+        .post("https://parkvue.microcrm.in/api/parking-stations", {
+          customer_id: 0,
+          vehicle_type: vehicle_type,
+          latitude: lat,
+          longitude: long,
+          green_pass: "no",
+        })
+        .then((res) => {
+          const { status_code, message, centerList } = res.data;
 
-        if (status_code == "1") {
-          setStationData(centerList);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
-      });
+          if (status_code == "1") {
+            setStationData(centerList);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching data: ", error);
+        });
+    } catch (error) {}
   };
 
   useEffect(() => {}, []);
@@ -297,7 +298,8 @@ export default function TabViewExample() {
         {currentLocation &&
           stationsData.map((item, index) => {
             return (
-              <MapViewDirections key={index}
+              <MapViewDirections
+                key={index}
                 origin={{
                   latitude: parseFloat(currentLocation.latitude),
                   longitude: parseFloat(currentLocation.longitude),
