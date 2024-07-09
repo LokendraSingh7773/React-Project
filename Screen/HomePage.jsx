@@ -306,7 +306,7 @@ export default function TabViewExample() {
                   latitude: parseFloat(item.latitude),
                   longitude: parseFloat(item.longitude),
                 }}
-                strokeWidth={5}
+                strokeWidth={4}
                 apikey={GOOGLE_MAPS_APIKEY}
                 strokeColor="#256db5"
               />
