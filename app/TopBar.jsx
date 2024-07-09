@@ -1,5 +1,5 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import HomeCarousel from '../components/HomeCarousel.jsx'
+import HomeCarousel from '../Screen/HomePage'
 import tailwind from 'twrnc';
 const Tab = createMaterialTopTabNavigator();
 
