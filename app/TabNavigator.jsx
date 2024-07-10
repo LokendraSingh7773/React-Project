@@ -5,7 +5,7 @@ import HomeScreen from "../Screen/HomePage";
 import MyVehicle from "../Screen/MyVehicle";
 
 import Profile from "../Screen/Profile";
-import TopBar from './TopBar'
+import Myparking from '../Screen/MyParking'
 import {
   Ionicons,
   Feather,
@@ -54,7 +54,7 @@ const Tabnavigation = () => {
         />
         <Tab.Screen
           name="My Parking"
-          component={TopBar}
+          component={Myparking}
           options={{
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (

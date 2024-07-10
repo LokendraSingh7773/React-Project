@@ -1,8 +1,10 @@
 import {
   AntDesign,
   FontAwesome,
+  FontAwesome6,
   Ionicons,
   MaterialCommunityIcons,
+  SimpleLineIcons,
 } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
@@ -59,6 +61,9 @@ export default function MyVehicle() {
           <AntDesign
             style={tw`bg-white p-1 rounded-full`}
             name="plus"
+            onPress={() => {
+              setModalVisible(true);
+            }}
             color={"#25AE7A"}
             size={26}
           />
@@ -114,19 +119,24 @@ export default function MyVehicle() {
           setModalVisible(!modalVisible);
         }}
       >
-        <View style={tw`bg-[#256db5] absolute bottom-6 w-full`}>
+        <View
+          style={tw`bg-white bottom-0 absolute w-full px-4 py-4 rounded-t-[20px]`}
+        >
           <View>
-            <Text>Hello World!</Text>
-            <Pressable onPress={() => setModalVisible(!modalVisible)}>
-              <Text>Hide Modal</Text>
+            <Text style={tw`text-lg font-semibold mt-2`}>Add Vehicle</Text>
+            
+            <Pressable>
+              <TouchableOpacity
+                onPress={() => setModalVisible(!modalVisible)}
+                     >
+                      <Text style={tw`text-[#f00000] font-medium absolute text-base bottom-4 right-0`}>
+                        Close
+                      </Text>
+                     </TouchableOpacity>
             </Pressable>
           </View>
         </View>
       </Modal>
-
-      <Pressable onPress={() => setModalVisible(true)}>
-        <Button style={tw`bg-black`} title="open Drawer"> </Button>
-      </Pressable>
     </SafeAreaView>
   );
 }
