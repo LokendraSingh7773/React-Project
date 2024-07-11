@@ -2,7 +2,6 @@ import {
   Image,
   StyleSheet,
   Platform,
-  Button,
   ScrollView,
   TouchableOpacity,
   Keyboard,
@@ -17,7 +16,9 @@ import {
   TouchableHighlight,
   RefreshControl,
 } from "react-native";
+import { Button } from "@rneui/themed";
 import React from "react";
+import tw from "twrnc";
 
 export default function HomeScreen(props) {
   const [refreshing, setRefreshing] = React.useState(false);
@@ -54,15 +55,21 @@ export default function HomeScreen(props) {
             maxLength={10}
           />
 
-          <TouchableOpacity
-            accessible={false}
-            onPress={() => props.navigation.navigate("Details")}
-            onSubmitEditing={Keyboard.dismiss}
-          >
-            <Text showSoftInputOnFocus={false} style={styles.continueButton}>
-              Continue
-            </Text>
-          </TouchableOpacity>
+          <View>
+            <Button
+              accessible={false}
+              onPress={() => props.navigation.navigate("Details")}
+              onSubmitEditing={Keyboard.dismiss}
+              buttonStyle={tw`bg-[#25AE7A] mt-11 mb-6 py-3 rounded-[23px]`}
+            >
+              <Text
+                showSoftInputOnFocus={false}
+                style={tw`text-center text-sm text-white font-normal`}
+              >
+                Continue
+              </Text>
+            </Button>
+          </View>
         </View>
       </View>
     </ScrollView>

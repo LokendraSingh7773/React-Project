@@ -2,21 +2,18 @@ import {
   Image,
   StyleSheet,
   Platform,
-  Button,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
-import { useState } from "react";
 import { Keyboard } from "react-native";
 import {
   Text,
   View,
-  TextInput,
-  TouchableHighlight,
   RefreshControl,
 } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
 import React from "react";
+import { Button } from "@rneui/themed";
+import tw from "twrnc";
 
 export default function HomeScreen(props) {
   const [refreshing, setRefreshing] = React.useState(false);
@@ -80,9 +77,18 @@ export default function HomeScreen(props) {
               focusedPinCodeContainerStyle: styles.activePinCodeContainer,
             }}
           />
-          <TouchableOpacity onPress={() => props.navigation.navigate("LoginProfilePage")}>
-            <Text style={styles.continueButton}>Continue</Text>
-          </TouchableOpacity>
+           <View>
+            <Button
+              onPress={() => props.navigation.navigate("LoginProfilePage")}
+              buttonStyle={tw`bg-[#25AE7A] mt-11 mb-6 py-3 rounded-[23px]`}
+            >
+              <Text
+                style={tw`text-center text-sm text-white font-normal`}
+              >
+                Continue
+              </Text>
+            </Button>
+            </View>
         </View>
       </View>
     </ScrollView>

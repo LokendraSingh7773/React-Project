@@ -10,15 +10,10 @@ import axios from "axios";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import MapViewDirections from "react-native-maps-directions";
-
+import { Button } from "@rneui/themed";
 const width = Dimensions.get("window").width;
 
 export default function TabViewExample() {
-  const origin = { latitude: 28.608365099039062, longitude: 77.19080897860965 };
-  const destination = {
-    latitude: 26.451747527532902,
-    longitude: 74.60540649567365,
-  };
   const GOOGLE_MAPS_APIKEY = "AIzaSyCIty6mcdUJPR_VOSP5vCjWp5ZoDQbEqXw";
 
   const [stationsData, setStationData] = useState([]);
@@ -148,13 +143,13 @@ export default function TabViewExample() {
                 </View>
               </View>
               <View>
-                <TouchableOpacity
-                  style={tw`bg-[#25AE7A]  mt-6 py-3 rounded-[23px]`}
+                <Button
+                  buttonStyle={tw`bg-[#25AE7A] mt-6  py-3 rounded-[23px]`}
                 >
                   <Text style={tw`text-center text-white font-medium`}>
                     Book Now
                   </Text>
-                </TouchableOpacity>
+                </Button>
               </View>
             </View>
           )}
@@ -229,13 +224,13 @@ export default function TabViewExample() {
                 </View>
               </View>
               <View>
-                <TouchableOpacity
-                  style={tw`bg-[#25AE7A]  mt-6 py-3 rounded-[23px]`}
+                <Button
+                  buttonStyle={tw`bg-[#25AE7A] mt-6  py-3 rounded-[23px]`}
                 >
                   <Text style={tw`text-center text-white font-medium`}>
                     Book Now
                   </Text>
-                </TouchableOpacity>
+                </Button>
               </View>
             </View>
           )}
@@ -316,7 +311,7 @@ export default function TabViewExample() {
           })}
       </MapView>
       <TabView
-        style={[tw`absolute bottom-0 h-[255px] w-full rounded-t-[20px]`]}
+        style={[tw`absolute bottom-0 h-[260px] w-full rounded-t-[20px]`]}
         animationEnabled={false}
         swipeEnabled={false}
         navigationState={{ index, routes }}

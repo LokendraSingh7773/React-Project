@@ -10,6 +10,7 @@ import {
 import React from "react";
 import { ScrollView } from "react-native";
 import { RefreshControl } from "react-native";
+import { Button } from "@rneui/themed";
 
 import tw from "twrnc";
 
@@ -31,7 +32,7 @@ export default function LoginProfile(props) {
       }
     >
       <View style={styles.applayout}>
-        <View style={{ top: 80 }}>
+        <View style={{ top: 50 }}>
           <Image
             source={require("@/assets/images/parkvue.png")}
             style={styles.reactLogo}
@@ -45,7 +46,7 @@ export default function LoginProfile(props) {
             placeholder="Enter number"
             placeholderTextColor="#24242480"
           />
-          <Text style={{ marginTop: 30, marginBottom: 8 }}>
+          <Text style={{ marginTop: 25, marginBottom: 8 }}>
             Enter Your Email
           </Text>
           <TextInput
@@ -53,7 +54,7 @@ export default function LoginProfile(props) {
             placeholder="Enter number"
             placeholderTextColor="#24242480"
           />
-          <Text style={{ marginTop: 30, marginBottom: 8 }}>
+          <Text style={{ marginTop: 25, marginBottom: 8 }}>
             Enter Your Address{" "}
           </Text>
           <TextInput
@@ -63,15 +64,14 @@ export default function LoginProfile(props) {
             keyboardType="email-address"
           />
 
-          <TouchableOpacity
-            accessible={false}
-            onPress={() => props.navigation.navigate('Home')}
-            onSubmitEditing={Keyboard.dismiss}
-          >
-            <Text showSoftInputOnFocus={false} style={styles.continueButton}>
-              Continue
-            </Text>
-          </TouchableOpacity>
+          <View>
+            <Button
+              onPress={() => props.navigation.navigate("Home")}
+              buttonStyle={tw`bg-[#25AE7A] mt-11 mb-6 py-3 rounded-[23px]`}
+            >
+              <Text style={tw`text-center text-sm text-white font-normal`}>Submit</Text>
+            </Button>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     marginStart: 4,
   },
   loginTitle: {
-    marginBottom: 40,
+    marginBottom: 30,
     fontSize: 24,
     fontWeight: "600",
     color: "#000000",
