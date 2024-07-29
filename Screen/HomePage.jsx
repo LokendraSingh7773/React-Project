@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SafeAreaView, View, useWindowDimensions } from "react-native";
+import { SafeAreaView, View, useWindowDimensions , BackHandler, Alert } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import tw from "twrnc";
 import { useEffect, useState } from "react";
@@ -17,9 +17,13 @@ export default function TabViewExample() {
   const GOOGLE_MAPS_APIKEY = "AIzaSyCIty6mcdUJPR_VOSP5vCjWp5ZoDQbEqXw";
 
   const [stationsData, setStationData] = useState([]);
+  const [stationsLatitude, setStationsLatitude] = useState(0);
+  const [stationsLongitude, setStationsLongitude] = useState(0);
+  const [stationDetailsFetched, setStationDetailsFetched] = useState(false);
 
   const getStationData = async (vehicle_type, lat, long) => {
     try {
+      setStationDetailsFetched(false);
       axios
         .post("https://parkvue.microcrm.in/api/parking-stations", {
           customer_id: 0,
@@ -30,18 +34,32 @@ export default function TabViewExample() {
         })
         .then((res) => {
           const { status_code, message, centerList } = res.data;
+          setStationDetailsFetched(true);
 
           if (status_code == "1") {
             setStationData(centerList);
+            setStationsLatitude(centerList[0].latitude);
+            setStationsLongitude(centerList[0].longitude);
+            console.log(stationsLatitude);
           }
         })
         .catch((error) => {
           console.error("Error fetching data: ", error);
         });
-    } catch (error) {}
+    } catch (error) {
+      console.log(err)
+    }
   };
 
-  useEffect(() => {}, []);
+  const createTheStationRoute = (indexData) => {
+    console.log(indexData);
+    let dataArrayOfStation = stationsData.at(indexData);
+    if (dataArrayOfStation) {
+      setStationsLatitude(dataArrayOfStation.latitude);
+      setStationsLongitude(dataArrayOfStation.longitude);
+    }
+  };
+  // useEffect(() => {}, []);
 
   const layout = useWindowDimensions();
 
@@ -85,7 +103,9 @@ export default function TabViewExample() {
           height={width}
           autoPlay={false}
           data={stationsData}
-          onSnapToItem={(index) => console.log("current index:", index)}
+          onSnapToItem={(index) => {
+            createTheStationRoute(index);
+          }}
           renderItem={({ item, index }) => (
             <View
               style={[
@@ -269,47 +289,70 @@ export default function TabViewExample() {
     getLocation();
   }, []);
 
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Exit!', 'Are you sure you want to go back?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {text: 'YES', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    // return () => backHandler.remove();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
-      <MapView
-        style={styles.map}
-        initialRegion={initialRegion}
-        mapType="terrain"
-        showsUserLocation={true}
-      >
-        {currentLocation &&
-          stationsData.map((item, index) => {
-            return (
-              <Marker
-                key={index}
-                coordinate={{
-                  latitude: parseFloat(item.latitude),
-                  longitude: parseFloat(item.longitude),
-                }}
-                title={item.station_name}
-              />
-            );
-          })}
-        {currentLocation &&
-          stationsData.map((item, index) => {
-            return (
-              <MapViewDirections
-                key={index}
-                origin={{
-                  latitude: parseFloat(currentLocation.latitude),
-                  longitude: parseFloat(currentLocation.longitude),
-                }}
-                destination={{
-                  latitude: parseFloat(item.latitude),
-                  longitude: parseFloat(item.longitude),
-                }}
-                strokeWidth={4}
-                apikey={GOOGLE_MAPS_APIKEY}
-                strokeColor="#256db5"
-              />
-            );
-          })}
-      </MapView>
+      {stationDetailsFetched == true && (
+        <MapView
+          style={styles.map}
+          initialRegion={initialRegion}
+          mapType="terrain"
+          showsUserLocation={true}
+        >
+          {stationDetailsFetched &&
+            stationsData.map((item, index) => {
+              return (
+                <Marker
+                  key={index}
+                  coordinate={{
+                    latitude: parseFloat(item.latitude),
+                    longitude: parseFloat(item.longitude),
+                  }}
+                  title={item.station_name}
+                />
+              );
+            })}
+          {stationDetailsFetched == true &&
+            stationsData.map((item, index) => {
+              return (
+                <MapViewDirections
+                  key={index}
+                  origin={{
+                    latitude: 26.91071756609974,
+                    longitude: 75.78035792542063,
+                  }}
+                  destination={{
+                    latitude: parseFloat(stationsLatitude),
+                    longitude: parseFloat(stationsLongitude),
+                  }}
+                  strokeWidth={4}
+                  apikey={GOOGLE_MAPS_APIKEY}
+                  strokeColor="#256db5"
+                />
+              );
+            })}
+        </MapView>
+      )}
       <TabView
         style={[tw`absolute bottom-0 h-[260px] w-full rounded-t-[20px]`]}
         animationEnabled={false}

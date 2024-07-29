@@ -1,187 +1,43 @@
-import {
-  AntDesign,
-  FontAwesome,
-  Ionicons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
-import React, { useEffect, useState, useRef } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
-import axios from "axios";
-
-import RBSheet from "react-native-raw-bottom-sheet";
+import { ScrollView, Text, View, TouchableOpacity, SafeAreaView } from "react-native";
+import { StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import LinearGradient from "react-native-linear-gradient";
 import { RefreshControl } from "react-native";
+import { AntDesign, EvilIcons, FontAwesome5 } from "@expo/vector-icons";
 import tw from "twrnc";
-import { BottomSheet, Button } from "@rneui/themed";
+import { Chip } from "@rneui/base";
+import { Button } from "@rneui/themed";
+import axios from "axios";
 import Toast from "react-native-toast-message";
 
-const CustomRadioButton = ({ label, selected, onSelect }) => (
-  <View>
-    <TouchableOpacity
-      style={[
-        tw`bg-white px-3 py-1 border-[1px] rounded-full mt-2 flex flex-row items-center gap-2`,
-        { borderColor: selected ? "#007BFF" : "#ccc" },
-      ]}
-      onPress={onSelect}
-    >
-      <MaterialCommunityIcons
-        name={label == "Car" ? "car" : "motorbike"}
-        color={selected ? "#007BFF" : "#000"}
-        size={26}
-      />
-      <Text style={[tw`text-sm`, { color: selected ? "#007BFF" : "#000" }]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  </View>
-);
-
-export default function MyVehicle() {
-  const refRBSheet = useRef();
+export default function MyParking() {
   const [refreshing, setRefreshing] = React.useState(false);
-  const [showVehicle, setShowVehicle] = useState([]);
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [IsUpdateVehicleDetails, setIsUpdateVehicleDetails] = useState(false);
-  const [IsFetchedVehicledata, setIsFetchedVehicleData] = useState(false);
+  const [ShowParkingData, setParkingData] = useState([]);
+  const [IsFetchedParkingData, setIsFetchedParkingData] = useState(null);
 
-  const GetVehicleData = async () => {
+  const getParkingData = async () => {
     try {
-      setIsFetchedVehicleData(false);
+      setIsFetchedParkingData(false);
       axios
-        .post("https://customer.theparkvue.com/api/customer-vehicle", {
-          customer_id: 1,
-          fleet_type: null,
+        .post("https://customer.theparkvue.com/api/customer-booking", {
+          customer_id: 2,
+          token:
+            "7c98a4fcb9ee1a8e6d196e846d809f65bb94355c1f2b432c4b959ea7b71e182d",
         })
         .then((res) => {
-          const { status_code, message, vehicleList } = res.data;
-          if (status_code == "1") {
-            setShowVehicle(vehicleList);
-            setIsFetchedVehicleData(true);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          setIsFetchedVehicleData(message);
-          Toast.show({
-            type: "error",
-            text1: message,
-          });
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const [vehicle_model, setInputValue] = useState("");
-  const [vehicle_number, setVehicleNumber] = useState("");
-  const [vehicle_number_old, setvehicle_number_old] = useState("");
-  const [temp_vehicle, settemp_vehicle] = useState("");
-
-  const vehicleData = {
-    customer_id: 1,
-    vehicle_model: vehicle_model,
-    vehicle_number: vehicle_number,
-    fleet_type: selectedValue,
-  };
-
-  const [isLoading, setIsLoading] = useState(false);
-  const Addvehicle = async () => {
-    try {
-      setIsLoading(true);
-      axios
-        .post("https://customer.theparkvue.com/api/add-vehicle", vehicleData, {
-          headers: {
-            customer_id: 1,
-            token:
-              "0bd480dc4cf9949c6d0f878e3ee186bd8bd3cc41864ee63a7174c0bbec16e839",
-          },
-        })
-        .then((res) => {
-          const { status_code, message } = res.data;
-
+          const { booking_list, message, status_code } = res.data;
           console.log(res.data);
-          setIsLoading(false);
           if (status_code == "1") {
-            setIsVisible(false);
-            GetVehicleData();
-            setInputValue(null);
-            setSelectedValue(null);
-            setVehicleNumber(null);
-            Toast.show({
-              type: "success",
-              text1: message,
-            });
+            if (booking_list.length > 0) {
+              setParkingData(booking_list);
+              setIsFetchedParkingData(true);
+            } else {
+              setIsFetchedParkingData(message);
+            }
           } else {
+            setIsFetchedParkingData(message);
             Toast.show({
-              type: "success",
-              text1: message,
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } catch (err) {
-      console.log(err);
-      Toast.show({
-        type: "success",
-        text1: message,
-      });
-    }
-  };
-
-  const UpdateTheVehicleDetails = {
-    customer_id: 1,
-    vehicle_model: vehicle_model,
-    vehicle_number: vehicle_number,
-    fleet_type: selectedValue,
-    vehicle_number_old: vehicle_number_old,
-    temp_vehicle: temp_vehicle,
-  };
-
-  const SHowUpdateTimeData = (item) => {
-    setInputValue(item.vehicle_model);
-    setVehicleNumber(item.vehicle_number);
-    setvehicle_number_old(item.vehicle_number);
-    setSelectedValue(item.fleet_type);
-  };
-
-  const IsUpdateVehicle = async () => {
-    try {
-      setIsLoading(true);
-      console.log(UpdateTheVehicleDetails);
-      axios
-        .post(
-          "https://customer.theparkvue.com/api/edit-vehicle",
-          UpdateTheVehicleDetails,
-          {
-            headers: {
-              customer_id: 1,
-              token:
-                "0bd480dc4cf9949c6d0f878e3ee186bd8bd3cc41864ee63a7174c0bbec16e839",
-            },
-          }
-        )
-        .then((res) => {
-          const { status_code, message } = res.data;
-          console.log(message);
-          setIsLoading(false);
-          if (status_code == "1") {
-            GetVehicleData();
-            setIsUpdateVehicleDetails(false);
-            setInputValue(null);
-            setSelectedValue(null);
-            setVehicleNumber(null);
-            Toast.show({
-              type: "success",
+              type: "error",
               text1: message,
             });
           }
@@ -193,280 +49,124 @@ export default function MyVehicle() {
       console.log(err);
     }
   };
-  const openTheAddVehicleModel = () => {
-    setIsVisible(true),
-      setInputValue(null),
-      setSelectedValue(null),
-      setVehicleNumber(null);
-  };
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      GetVehicleData();
       setRefreshing(false);
-    });
+    }, 2000);
   }, []);
 
   useEffect(() => {
-    GetVehicleData();
+    getParkingData();
   }, []);
-
   return (
     <>
-      <ScrollView
+      <SafeAreaView
         contentContainerStyle={styles.scrollView}
         style={tw`h-full flex`}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        // refreshControl={
+        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        // }
       >
         <View
-          style={tw`flex flex-row justify-between mx-3 px-3 py-2 items-center rounded-[28px] my-2 bg-[#084B82]`}
+          style={tw`flex flex-row justify-between mx-3 px-3 py-3 items-center rounded-[28px] my-2 bg-[#084B82]`}
         >
-          <Text style={tw`text-white font-semibold text-base`}>My Vehicle</Text>
-          <TouchableOpacity>
-            <AntDesign
-              style={tw`bg-white p-1 rounded-full`}
-              name="plus"
-              onPress={openTheAddVehicleModel}
-              color={"#25AE7A"}
-              size={26}
-            />
-          </TouchableOpacity>
+          <Text style={tw`text-white font-semibold text-base`}>My Parking</Text>
         </View>
-
-        <Text style={tw`mt-2 text-base text-[#000000] opacity-50 mx-4`}>
-          {showVehicle.length} Vehicle added
+        <Text style={tw`mt-2 text-base text-[#000000] opacity-50 mx-6 mb-3`}>
+          Total {ShowParkingData.length} Parking
         </Text>
 
-        {IsFetchedVehicledata === true ? (
-          <ScrollView style={tw`mt-4 mx-3 mb-25`}>
-            {showVehicle.map((item, index) => {
+        {/* Main design */}
+
+        {IsFetchedParkingData == true ? (
+          <ScrollView>
+            {ShowParkingData.map((item, index) => {
               return (
-                <TouchableOpacity
-                  onPress={() => {
-                    refRBSheet.current.open(),
-                      SHowUpdateTimeData(item),
-                      console.log(item.id);
-                  }}
+                <View
                   key={index}
+                  style={tw`bg-white mx-4 px-3 mb-3 rounded-[12px] py-3`}
                 >
-                  <View
-                    style={tw`bg-white flex flex-row py-2 px-2 mb-3 items-center gap-4 rounded-md`}
-                  >
-                    {item.fleet_type == "bike" ? (
-                      <View
-                        style={tw`bg-[#F8E8DA] items-center rounded-[11px] min-h-[55px] min-w-[55px] justify-center`}
-                      >
-                        <MaterialCommunityIcons
-                          name="bike"
-                          color={"#FF7700"}
-                          size={22}
-                        />
-                      </View>
-                    ) : (
-                      <View
-                        style={tw`bg-[#DAF8F0] items-center rounded-[11px] min-h-[55px] min-w-[55px] justify-center`}
-                      >
-                        <FontAwesome name="car" color={"#00BC8A"} size={22} />
-                      </View>
-                    )}
-                    <View>
-                      <Text style={tw`text-black font-normal text-sm`}>
-                        {item.fleet_type}
+                  <View style={tw`flex flex-row items-center justify-between`}>
+                    <Text style={tw`text-[#606060]`}>ID:{item.booking_no}</Text>
+                    <Chip size="xs" color={"#F8E8DA"}>
+                      <Text style={tw`text-[#ff7700] text-sm font-medium px-2`}>
+                        {item.booking_status}
                       </Text>
-                      <Text style={tw`text-black font-semibold text-sm mt-1`}>
-                        {item.vehicle_model} :{item.vehicle_number}
+                    </Chip>
+                  </View>
+                  <View
+                    style={tw`flex flex-row items-center justify-between mt-2`}
+                  >
+                    <View>
+                      <Text style={tw`text-black font-medium`}>
+                        {item.center_name}
+                      </Text>
+                      <Text style={tw`text-[#9A9A9A] text-xs`}>
+                        {item.parking_address}
                       </Text>
                     </View>
+                    <Button
+                      buttonStyle={tw`rounded-lg px-4 py-2 `}
+                      type="none"
+                      titleStyle={tw`text-[#25AE7A]`}
+                    >
+                      <FontAwesome5
+                        name="directions"
+                        color="#25AE7A"
+                        size={25}
+                      />
+                    </Button>
                   </View>
-                </TouchableOpacity>
+                  <View
+                    style={tw`flex flex-row items-center justify-between mt-2 bg-[#f5f5f5] px-2 rounded-md py-2`}
+                  >
+                    <View style={tw`flex flex-row`}>
+                      <Text style={tw`text-[#606060]`}>{item.vehicle_model} : </Text>
+                      <Text style={tw`text-[#5814B0] font-semibold text-sm`}>
+                        {item.vehicle_number}
+                      </Text>
+                    </View>
+                    <Text style={tw`text-[#555555] text-base font-bold `}>
+                      ₹{item.total_amount}
+                    </Text>
+                  </View>
+                  <View style={tw`flex flex-row mt-3 gap-4 items-center`}>
+                    <View style={tw`flex flex-row items-center gap-2`}>
+                      <EvilIcons name="calendar" color="#868686" size={30} />
+                      <View>
+                        <Text style={tw`text-[#868686] font-medium`}>
+                          {item.start_date}
+                        </Text>
+                        <Text style={tw`text-[#9A9A9A] `}>{item.start_time}</Text>
+                      </View>
+                    </View>
+                    <View>
+                      <AntDesign name="arrowright" color="#868686" size={24} />
+                    </View>
+                    <View>
+                      <View>
+                        <Text style={tw`text-[#868686] font-medium`}>
+                          {item.end_date}
+                        </Text>
+                        <Text style={tw`text-[#9A9A9A]`}>{item.end_time}</Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
               );
             })}
           </ScrollView>
         ) : (
-          <View style={tw`items-center h-full mt-40`}>
-            <Button
-              style={tw`text-center justify-center items-center`}
-              type="Clear"
-              loadingProps={{
-                size: "40px",
-                color: "#084b82",
-              }}
-              loadingStyle={tw`text-xl`}
-              loading
-            ></Button>
-            <Text style={tw`text-center text-[#084b82] text-base ml-2`}>
-              Loading..
-            </Text>
+          <View>
+            <Text>Hello</Text>
           </View>
         )}
-        <BottomSheet
-          onBackdropPress={() => {
-            setIsVisible(false);
-          }}
-          modalProps={{}}
-          isVisible={isVisible}
-        >
-          <View style={tw`bg-white w-full px-4 py-6 rounded-t-[20px]`}>
-            <View style={tw`absolute right-2`}>
-              <Button
-                onPress={() => setIsVisible(false)}
-                buttonStyle={tw`rounded-lg px-4 py-2 text-[#f00]`}
-                titleStyle={tw`text-[#f00]`}
-                type="Clear"
-              >
-                Close
-                {/* <AntDesign name="closecircleo" color="red" size={32} /> */}
-              </Button>
-            </View>
-            <View style={[tw`px-2`]}>
-              <Text style={tw`text-lg font-semibold `}>Add Vehicle</Text>
-              <View>
-                <Text style={tw`text-sm mt-4`}>Select Vehicle Type</Text>
-                <View style={[tw`flex flex-row gap-3`]}>
-                  <CustomRadioButton
-                    label="Car"
-                    value="car"
-                    selected={selectedValue === "car"}
-                    onSelect={() => setSelectedValue("car")}
-                  />
-                  <CustomRadioButton
-                    label="Bike"
-                    value="bike"
-                    selected={selectedValue === "bike"}
-                    onSelect={() => setSelectedValue("bike")}
-                  />
-                </View>
-                <View>
-                  <Text style={tw`text-sm mt-7`}>Vehicle Number</Text>
-                  <TextInput
-                    style={tw`w-full border-b text-sm items-center h-8 border-b-[#ccc] uppercase`}
-                    placeholder="Enter number"
-                    value={vehicleData.vehicle_number}
-                    onChangeText={(text) => setVehicleNumber(text)}
-                    placeholderTextColor="#24242480"
-                    keyboardType="text"
-                    autoCapitalize="characters"
-                    maxLength={10}
-                  />
-                </View>
-                <View>
-                  <Text style={tw`text-sm mt-7`}>Vehicle Name</Text>
-                  <TextInput
-                    style={tw`w-full border-b text-sm items-center h-8 border-b-[#ccc] uppercase`}
-                    placeholder="Enter Vehicle Name"
-                    value={vehicleData.vehicle_model}
-                    onChangeText={(text) => setInputValue(text)}
-                    placeholderTextColor="#24242480"
-                    keyboardType="text"
-                    autoCapitalize="characters"
-                    maxLength={40}
-                  />
-                </View>
-                <View>
-                  <Button
-                    onPress={Addvehicle}
-                    loading={isLoading}
-                    buttonStyle={tw`bg-[#25AE7A] mt-12 mb-6 py-3 rounded-[23px]`}
-                  >
-                    <Text style={tw`text-center text-white font-medium`}>
-                      Submit
-                    </Text>
-                  </Button>
-                </View>
-              </View>
-            </View>
-          </View>
-        </BottomSheet>
-
-        {/* for update vehicle  */}
-        <RBSheet
-          ref={refRBSheet}
-          draggable={true}
-          
-          dragOnContent={false}
-          customStyles={{
-            wrapper: {
-              borderTopRightRadius: 20,
-              backgroundColor: "#cccccc80",
-            },
-
-            draggableIcon: {
-              backgroundColor: "#000",
-            },
-          }}
-          customModalProps={{
-            animationType: "slide",
-            statusBarTranslucent: true,
-          }}
-          customAvoidingViewProps={{
-            enabled: false,
-          }}
-        >
-          <View style={tw`bg-white w-full px-4 py-2 rounded-t-[20px]`}>
-            <View style={[tw`px-2`]}>
-              <Text style={tw`text-lg font-semibold `}>Edit Vehicle</Text>
-              <View>
-                <Text style={tw`text-sm mt-4`}>Select Vehicle Type</Text>
-                <View style={[tw`flex flex-row gap-3`]}>
-                  <CustomRadioButton
-                    label="Car"
-                    value="car"
-                    selected={selectedValue === "car"}
-                    // onSelect={() => setSelectedValue("car")}
-                  />
-                  <CustomRadioButton
-                    label="Bike"
-                    value="bike"
-                    selected={selectedValue === "bike"}
-                    // onSelect={() => setSelectedValue("bike")}
-                  />
-                </View>
-                <View>
-                  <Text style={tw`text-sm mt-7`}>Vehicle Number</Text>
-                  <TextInput
-                    style={tw`w-full border-b text-sm items-center h-8 border-b-[#ccc] uppercase`}
-                    placeholder="Enter number"
-                    value={UpdateTheVehicleDetails.vehicle_number}
-                    onChangeText={(text) => setVehicleNumber(text)}
-                    placeholderTextColor="#24242480"
-                    keyboardType="text"
-                    autoCapitalize="characters"
-                    maxLength={10}
-                  />
-                </View>
-                <View>
-                  <Text style={tw`text-sm mt-7`}>Vehicle Name</Text>
-                  <TextInput
-                    style={tw`w-full border-b text-sm items-center h-8 border-b-[#ccc] uppercase`}
-                    placeholder="Enter Vehicle Name"
-                    value={UpdateTheVehicleDetails.vehicle_model}
-                    onChangeText={(text) => setInputValue(text)}
-                    placeholderTextColor="#24242480"
-                    autoCapitalize="characters"
-                    maxLength={40}
-                  />
-                </View>
-                <View>
-                  <Button
-                    onPress={IsUpdateVehicle}
-                    loading={isLoading}
-                    buttonStyle={tw`bg-[#25AE7A] mt-12 mb-6 py-3 rounded-[23px]`}
-                  >
-                    <Text style={tw`text-center text-white font-medium`}>
-                      Submit
-                    </Text>
-                  </Button>
-                </View>
-              </View>
-            </View>
-          </View>
-        </RBSheet>
         <View style={tw`absolute -bottom-4 w-full h-full `}>
           <Toast position={"bottom"}></Toast>
         </View>
-      </ScrollView>
+      </SafeAreaView>
     </>
   );
 }
@@ -477,47 +177,3 @@ const styles = StyleSheet.create({
     height: "100%",
   },
 });
-
-// import React, { useRef } from "react";
-// import { View, Button, Text } from "react-native";
-// import RBSheet from "react-native-raw-bottom-sheet";
-
-// export default function Example() {
-//   const refRBSheet = useRef();
-
-//   return (
-//     <View style={{ flex: 1 }}>
-//       <Button title="OPEN BOTTOM SHEET" onPress={() => refRBSheet(true)} />
-//       <RBSheet
-//         ref={refRBSheet}
-//         draggable={true}
-//         closeOnPressMask={true}
-//         dragOnContent={true}
-//         customStyles={{
-//           wrapper: {
-//             backgroundColor: "#ffffff50",
-//           },
-//           draggableIcon: {
-//             backgroundColor: "#000",
-//           },
-//         }}
-//         customModalProps={{
-//           animationType: "slide",
-//           statusBarTranslucent: true,
-//         }}
-//         customAvoidingViewProps={{
-//           enabled: false,
-//         }}
-//       >
-//         <View>
-//           <Text>
-//             Hello Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi
-//             alias adipisci architecto dolores deleniti ullam expedita tempora
-//             voluptatem? Repudiandae excepturi, minima modi vitae dolorem quo
-//             facilis numquam ipsum et labore.
-//           </Text>
-//         </View>
-//       </RBSheet>
-//     </View>
-//   );
-// }

@@ -105,7 +105,7 @@ export default function MyVehicle() {
         .then((res) => {
           const { status_code, message } = res.data;
 
-          console.log(res.data);
+          // console.log(res.data);
           setIsLoading(false);
           if (status_code == "1") {
             setIsVisible(false);
@@ -156,7 +156,6 @@ export default function MyVehicle() {
   const IsUpdateVehicle = async () => {
     try {
       setIsLoading(true);
-      console.log(UpdateTheVehicleDetails);
       axios
         .post(
           "https://customer.theparkvue.com/api/edit-vehicle",
@@ -171,7 +170,7 @@ export default function MyVehicle() {
         )
         .then((res) => {
           const { status_code, message } = res.data;
-          console.log(message);
+          // console.log(message);
           setIsLoading(false);
           if (status_code == "1") {
             GetVehicleData();
@@ -244,12 +243,12 @@ export default function MyVehicle() {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    SHowUpdateTimeData(item), console.log(item.id);
+                    SHowUpdateTimeData(item);
                   }}
                   key={index}
                 >
                   <View
-                    style={tw`bg-white flex flex-row py-2 px-2 mb-3 items-center gap-4 rounded-md`}
+                    style={tw`bg-white flex flex-row py-2 px-2 mb-3 items-center gap-4 rounded-[11px]`}
                   >
                     {item.fleet_type == "bike" ? (
                       <View

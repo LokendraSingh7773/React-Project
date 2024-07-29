@@ -27,7 +27,7 @@ const Tabnavigation = () => {
         initialRouteName="Home1"
         screenOptions={{
           tabBarShowLabel: true,
-          tabBarStyle : {backgroundColor : '#fff' , borderTopRightRadius:20, borderTopLeftRadius:20, padding:4},
+          tabBarStyle : {backgroundColor : '#fff' , borderTopRightRadius:20, borderTopLeftRadius:20, paddingBottom:9, paddingTop:9,height:60},
           tabBarActiveTintColor: '#084B82',
           tabBarInactiveTintColor: '#8D8D8D'
         }}
