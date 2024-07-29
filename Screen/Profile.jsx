@@ -96,11 +96,11 @@ export default function MyProfile() {
             <View style={tw`bg-white flex flex-row justify-between`}>
               <View style={tw`flex flex-row items-center gap-2`}>
                 <MaterialCommunityIcons
-                  size={20}
+                  size={23}
                   name="ticket-outline"
                   color={"#13A74A"}
                 />
-                <Text style={tw`text-[#13A74A] font-medium`}>Green Pass</Text>
+                <Text style={tw`text-[#13A74A] text-[15px] font-medium`}>Green Pass</Text>
               </View>
               <View>
                 <Button
@@ -126,7 +126,7 @@ export default function MyProfile() {
 
           {/* Help */}
           <TouchableOpacity
-            style={tw`flex flex-row items-center gap-3 mt-6 bg-white rounded-[11px] py-[15px] px-3`}
+            style={tw`flex flex-row items-center gap-3 mt-5 bg-white rounded-[11px] py-[15px] px-3`}
           >
             <Feather name="info" color="#6E6E6E" size={20} />
             <Text style={tw`font-medium text-[#6E6E6E]`}>Help</Text>
