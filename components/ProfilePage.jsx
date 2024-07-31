@@ -66,7 +66,7 @@ export default function LoginProfile(props) {
 
           <View>
             <Button
-              onPress={() => props.navigation.navigate("Home")}
+              onPress={() => props.navigation.navigate("MainDesign")}
               buttonStyle={tw`bg-[#25AE7A] mt-11 mb-6 py-3 rounded-[23px]`}
             >
               <Text style={tw`text-center text-sm text-white font-normal`}>Submit</Text>

@@ -1,9 +1,16 @@
-import { ScrollView, Text, View, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar } from "@rneui/themed";
 import { Button } from "@rneui/themed";
 import { RefreshControl } from "react-native";
+import { BottomSheet } from "@rneui/themed";
 import {
   AntDesign,
   Feather,
@@ -15,16 +22,124 @@ import {
   Octicons,
 } from "@expo/vector-icons";
 import tw from "twrnc";
+import axios from "axios";
+import Toast from "react-native-toast-message";
 
 export default function MyProfile() {
   const [refreshing, setRefreshing] = React.useState(false);
+  const [ShowProfileData, setShowProfileData] = useState([]);
+  const [IsFetchedProfileData, setIsFetchedProfileData] = useState(false);
+  const [IsUpdateProfiledetails, setIsUpdateProfileDetails] = useState(false);
+
+  const getProfileData = async () => {
+    try {
+      setIsFetchedProfileData(false);
+      axios
+        .post("https://customer.theparkvue.com/api/customer-profile", {
+          customer_id: 2,
+          token:
+          "7c98a4fcb9ee1a8e6d196e846d809f65bb94355c1f2b432c4b959ea7b71e182d",
+        })
+        .then((res) => {
+          const { customer_data, message, status_code } = res.data;
+          // console.log(res.data);
+
+          if (status_code == "1") {
+            setShowProfileData(customer_data);
+            setIsFetchedProfileData(true);
+          } else {
+            setIsFetchedProfileData(message);
+            Toast.show({
+              type: "error",
+              text1: message,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const [name, setName] = useState("");
+  const [email, setemail] = useState("");
+  const [address, setaddress] = useState("");
+  const [customer_image, setcustomer_image] = useState("");
+  const [mobile, setnumber] = useState("");
+
+  const GetUpdateProfileData = {
+    customer_id: 2,
+    name: name,
+    mobile: mobile,
+    email: email,
+    address: address,
+    customer_image: customer_image,
+  };
+
+  const GetProfileData = (ShowProfileData) => {
+    setName(ShowProfileData.name);
+    setemail(ShowProfileData.email);
+    setaddress(ShowProfileData.address);
+    setnumber(ShowProfileData.mobile);
+    setIsUpdateProfileDetails(true);
+  };
+
+  const [isLoading, setisLoading] = useState();
+
+  const ISUpdateTheProfileDetails = async () => {
+    try {
+      setisLoading(true);
+      axios
+        .post(
+          "https://customer.theparkvue.com/api/update-profile",
+          GetUpdateProfileData , {
+            headers: {
+              customer_id: 2,
+              token:
+                "7c98a4fcb9ee1a8e6d196e846d809f65bb94355c1f2b432c4b959ea7b71e182d",
+            },
+          }
+        )
+        .then((res) => {
+          const { message, status_code } = res.data;
+
+          setisLoading(false);
+          if (status_code == "1") {
+            getProfileData()
+            setIsUpdateProfileDetails(false)
+            Toast.show({
+              type: "success",
+              text1: message,
+            });
+          } else {
+            Toast.show({
+              type: "error",
+              text1: message,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
+      getProfileData();
       setRefreshing(false);
-    }, 2000);
+    });
   }, []);
+
+  useEffect(() => {
+    getProfileData();
+  }, []);
+
   return (
     <>
       <ScrollView
@@ -61,16 +176,23 @@ export default function MyProfile() {
               icon={{ name: "user", type: "font-awesome", color: "#3879F0" }}
               containerStyle={tw`bg-white absolute -top-11 border-[5px] border-[#f5f5f5]`}
             />
-            <TouchableOpacity style={tw`self-end mt-1`}>
+            <TouchableOpacity
+              onPress={() => {
+                GetProfileData(ShowProfileData);
+              }}
+              style={tw`self-end mt-1`}
+            >
               <MaterialIcons name="edit" color="#000" size={25} />
             </TouchableOpacity>
 
             <Text style={tw`mt-7 text-[#084B82] font-bold text-lg mb-1`}>
-              Ankur Kumar Gupta
+              {ShowProfileData.name}
             </Text>
             <View style={tw`flex flex-row gap-2 mt-2`}>
               <FontAwesome size={20} name="phone" color={"#8D8D8D"} />
-              <Text style={tw`text-[#8D8D8D]`}>+91 9982499155</Text>
+              <Text style={tw`text-[#8D8D8D]`}>
+                +91 {ShowProfileData.mobile}
+              </Text>
             </View>
             <View style={tw`flex flex-row gap-2 mt-1 items-center`}>
               <MaterialCommunityIcons
@@ -78,15 +200,11 @@ export default function MyProfile() {
                 name="email"
                 color={"#8D8D8D"}
               />
-              <Text style={tw`text-[#8D8D8D]`}>
-                lokendrasingh0773@gmail.com
-              </Text>
+              <Text style={tw`text-[#8D8D8D]`}>{ShowProfileData.email}</Text>
             </View>
             <View style={tw`flex flex-row gap-2 mt-1 items-center`}>
               <FontAwesome6 size={20} name="location-dot" color={"#8D8D8D"} />
-              <Text style={tw`text-[#8D8D8D]`}>
-                Patel Marg ,Mansarovar ,Jaipur , 302020
-              </Text>
+              <Text style={tw`text-[#8D8D8D]`}>{ShowProfileData.address}</Text>
             </View>
           </View>
           {/* For Green Pass */}
@@ -100,7 +218,9 @@ export default function MyProfile() {
                   name="ticket-outline"
                   color={"#13A74A"}
                 />
-                <Text style={tw`text-[#13A74A] text-[15px] font-medium`}>Green Pass</Text>
+                <Text style={tw`text-[#13A74A] text-[15px] font-medium`}>
+                  Green Pass
+                </Text>
               </View>
               <View>
                 <Button
@@ -164,7 +284,91 @@ export default function MyProfile() {
             <Text style={tw`font-medium text-[#f00]`}>Logout</Text>
           </TouchableOpacity>
         </ScrollView>
+
+        {/* for update vehicle  */}
+        <BottomSheet
+          onBackdropPress={() => {
+            setIsUpdateProfileDetails(false);
+          }}
+          modalProps={{}}
+          isVisible={IsUpdateProfiledetails}
+        >
+          <View style={tw`bg-white w-full px-4 py-6 rounded-t-[20px]`}>
+            <View style={tw`absolute right-2`}>
+              <Button
+                onPress={() => setIsUpdateProfileDetails(false)}
+                buttonStyle={tw`rounded-lg px-4 py-2 text-[#f00]`}
+                titleStyle={tw`text-[#f00]`}
+                type="Clear"
+              >
+                Close
+                {/* <AntDesign name="closecircleo" color="red" size={32} /> */}
+              </Button>
+            </View>
+            <View style={[tw`px-2`]}>
+              <Text style={tw`text-lg font-semibold `}>Edit Profile</Text>
+              <View>
+                <View>
+                  <Text style={tw`text-sm mt-7`}>Name</Text>
+                  <TextInput
+                    style={tw`w-full border-b text-sm items-center h-8 border-b-[#ccc]`}
+                    placeholder="Enter Name"
+                    value={GetUpdateProfileData.name}
+                    onChangeText={(text) => setName(text)}
+                    placeholderTextColor="#24242480"
+                    keyboardType="text"
+                  />
+                </View>
+                <View>
+                  <Text style={tw`text-sm mt-7`}>Mobile Number</Text>
+                  <TextInput
+                    style={tw`w-full border-b text-sm items-center h-8 border-b-[#ccc] uppercase`}
+                    placeholder="Enter Mobile Number"
+                    value={GetUpdateProfileData.mobile}
+                    onChangeText={(text) => setnumber(text)}
+                    placeholderTextColor="#24242480"
+                    keyboardType="text"
+                  />
+                </View>
+                <View>
+                  <Text style={tw`text-sm mt-7`}>Email Address</Text>
+                  <TextInput
+                    style={tw`w-full border-b text-sm items-center h-8 border-b-[#ccc] `}
+                    placeholder="Enter Email Address"
+                    value={GetUpdateProfileData.email}
+                    onChangeText={(text) => setemail(text)}
+                    placeholderTextColor="#24242480"
+                  />
+                </View>
+                <View>
+                  <Text style={tw`text-sm mt-7`}>Your Address</Text>
+                  <TextInput
+                    style={tw`w-full border-b text-sm items-center h-8 border-b-[#ccc] `}
+                    placeholder="Enter Address"
+                    value={GetUpdateProfileData.address}
+                    onChangeText={(text) => setaddress(text)}
+                    placeholderTextColor="#24242480"
+                  />
+                </View>
+                <View>
+                  <Button
+                    onPress={ISUpdateTheProfileDetails}
+                    loading={isLoading}
+                    buttonStyle={tw`bg-[#25AE7A] mt-12 mb-6 py-3 rounded-[23px]`}
+                  >
+                    <Text style={tw`text-center text-white font-medium`}>
+                      Submit
+                    </Text>
+                  </Button>
+                </View>
+              </View>
+            </View>
+          </View>
+        </BottomSheet>
       </ScrollView>
+      <View style={tw`absolute bottom-4 w-full h-full `}>
+          <Toast style={tw`border-2`} position={"top"}></Toast>
+        </View>
     </>
   );
 }
