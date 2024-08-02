@@ -10,6 +10,7 @@ import HomeScreen from "../Screen/HomePage";
 import MyVehicle from "../Screen/MyVehicle";
 import Profile from "../Screen/Profile";
 import Myparking from '../Screen/MyParking'
+import ShareDetails from "../Screen/ShareData"
 import {
   Ionicons,
   Feather,
@@ -108,6 +109,11 @@ function App() {
           name="Park"
           component={ParkingDetails}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+        name="ShareDetails"
+        component={ShareDetails}
+        options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

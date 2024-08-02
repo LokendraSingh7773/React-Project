@@ -5,6 +5,8 @@ import {
   View,
   TouchableOpacity,
   Image,
+  Alert,
+  Share,
   Linking,
 } from "react-native";
 import { ScrollView } from "react-native";
@@ -17,9 +19,10 @@ import {
   EvilIcons,
 } from "@expo/vector-icons";
 import tw from "twrnc";
-import SvgUri from "react-native-svg-uri";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
 
 export default function ParkingDetails({ route, navigation }) {
   const { itemId } = route.params;
@@ -37,7 +40,7 @@ export default function ParkingDetails({ route, navigation }) {
         })
         .then((res) => {
           const { status_code, message, booking_details } = res.data;
-          console.log(res.data);
+          // console.log(res.data);
           if (status_code == "1") {
             setIsShowParkingData(booking_details);
             setIsFetchedParkingData(true);
@@ -51,6 +54,23 @@ export default function ParkingDetails({ route, navigation }) {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const share = async () => {
+    const { uri } = await FileSystem.downloadAsync(
+      "https://cdn.pixabay.com/photo/2021/12/12/16/10/qr-6865526_1280.png",
+      FileSystem.documentDirectory + "pepe.jpg"
+    );
+  //  const messageText = 'Text that you want to share goes here'
+    
+
+    console.log("Waiting for share to resolve:");
+    await Sharing.shareAsync(uri, {
+      mimeType: "image/jpeg",
+      dialogTitle:"Share this text",
+      UTI: "JPEG",
+    });
+    console.log("File has been shared");
   };
 
   // for location
@@ -91,7 +111,12 @@ export default function ParkingDetails({ route, navigation }) {
         <ScrollView style={tw`mx-5 mt-5`}>
           <View style={tw`bg-white rounded-[29px] px-4 py-4`}>
             <TouchableOpacity style={tw`self-end`}>
-              <Octicons name="share-android" color="#000" size={26} />
+              <Octicons
+                onPress={share}
+                name="share-android"
+                color="#000"
+                size={26}
+              />
             </TouchableOpacity>
             <Image
               style={tw`w-[165px] h-[165px] self-center mt-2`}
@@ -172,8 +197,8 @@ export default function ParkingDetails({ route, navigation }) {
                 <Text style={tw`text-[#606060] text-right`}>
                   {/* {item.end_time} */}Vehicle
                 </Text>
-                <Text style={tw`text-[#5814B0] font-semibold text-sm `}>
-                  {IsShowParkingData.vehicle_model} :{" "}
+                <Text style={tw`text-[#5814B0] font-semibold text-xs `}>
+                  {/* {IsShowParkingData.vehicle_model} :{" "} */}
                   {IsShowParkingData.vehicle_number}
                 </Text>
               </View>

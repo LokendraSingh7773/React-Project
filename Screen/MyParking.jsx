@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image,
+  Linking,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -42,6 +43,7 @@ export default function MyParking({ navigation }) {
             if (booking_list.length > 0) {
               setParkingData(booking_list);
               setIsFetchedParkingData(true);
+              console.log("The Location is")
             } else {
               setIsFetchedParkingData(message);
             }
@@ -67,6 +69,17 @@ export default function MyParking({ navigation }) {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  // for location
+  const openGoogleMaps = (item) => {
+    const latitude = item.latitude; // Example latitude
+    const longitude = item.longitude; // Example longitude
+    const url = `https://www.google.com/maps/?q=${latitude},${longitude}`;
+
+    Linking.openURL(url).catch((err) =>
+      console.error("Failed to open URL", err)
+    );
+  };
 
   useEffect(() => {
     getParkingData();
@@ -100,8 +113,7 @@ export default function MyParking({ navigation }) {
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    navigation.navigate("Park", { itemId: item.parking_id }),
-                      console.log("The Station Id is " + item.parking_id);
+                    navigation.navigate("Park", { itemId: item.parking_id })
                   }}
                 >
                   <View style={tw`bg-white mx-4 px-3 mb-3 rounded-[11px] py-3`}>
@@ -150,6 +162,7 @@ export default function MyParking({ navigation }) {
                         </Text>
                       </View>
                       <Button
+                        onPress={()=>{openGoogleMaps(item)}}
                         buttonStyle={tw`rounded-lg px-4 py-2 `}
                         type="none"
                         radius={"xl"}
