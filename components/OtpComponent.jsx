@@ -1,22 +1,58 @@
-import {
-  Image,
-  StyleSheet,
-  Platform,
-  ScrollView,
-} from "react-native";
+import { Image, StyleSheet, Platform, ScrollView } from "react-native";
 import { Keyboard } from "react-native";
-import {
-  Text,
-  View,
-  RefreshControl,
-} from "react-native";
+import { useState } from "react";
+import { Text, View, RefreshControl } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { Button } from "@rneui/themed";
 import tw from "twrnc";
+import Toast from "react-native-toast-message";
+import axios from "axios";
 
-export default function HomeScreen(props) {
+export default function HomeScreen({ route, navigation }) {
   const [refreshing, setRefreshing] = React.useState(false);
+  const [userOTP, setuserOTP] = useState(null);
+  const { UserNumber } = route.params;
+
+  const ForOTPData = {
+    mobile: UserNumber,
+    otp: userOTP,
+  };
+
+  const VerifyTheUser = () => {
+    try {
+      axios
+        .post("https://customer.theparkvue.com/api/customer-verify", ForOTPData)
+        .then((res) => {
+          const { status_code, message, customer_id } = res.data;
+          console.log(res.data);
+          console.log(userOTP);
+          if (status_code == "1") {
+            AsyncStorage.setItem("customer_id", customer_id);
+            navigation.navigate("MainDesign");
+          } else if (status_code == "2") {
+            AsyncStorage.setItem("customer_id", customer_id);
+            navigation.navigate("LoginProfilePage");
+          } else {
+            Toast.show({
+              type: "error",
+              text1: message,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
+  const handleTextChange = (value) => {
+    console.log('Text changed:', value);
+    setuserOTP(value);
+  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -54,42 +90,49 @@ export default function HomeScreen(props) {
               marginBottom: 40,
             }}
           >
-            <Text style={{ fontWeight: "600", fontSize: 16 }}>9982499155</Text>
+            <Text style={{ fontWeight: "600", fontSize: 16 }}>
+              {UserNumber}
+            </Text>
             <Text
               style={{ fontWeight: "600", fontSize: 16, color: "#084B82" }}
-              onPress={() => props.navigation.navigate("login")}
+              onPress={() => navigation.navigate("login")}
             >
               Change
             </Text>
           </View>
-
           <OtpInput
-            autoFocus= {false}
-            numberOfDigits={5}
+            numberOfDigits={4}
             focusColor="green"
+            value={userOTP}
+            onTextChange={handleTextChange}
+            keyboardType="numeric"
             focusStickBlinkingDuration={500}
-            onFilled={(text) => console.log(`OTP is ${text}`)}
+            onFilled={(otp) => console.log(`OTP is ${otp}`)}
             theme={{
-              containerStyle: styles.container,
-              pinCodeContainerStyle: styles.pinCodeContainer,
-              pinCodeTextStyle: styles.pinCodeText,
+              containerStyle: tw`px-4`,
+              pinCodeContainerStyle: [
+                styles.pinCodeContainer,
+                tw`w-16 bg-[#EFEFEF]`,
+              ],
+              pinCodeotpStyle: styles.pinCodeText,
               focusStickStyle: styles.focusStick,
               focusedPinCodeContainerStyle: styles.activePinCodeContainer,
             }}
           />
-           <View>
+          <View>
             <Button
-              onPress={() => props.navigation.navigate("LoginProfilePage")}
+              onPress={VerifyTheUser}
               buttonStyle={tw`bg-[#25AE7A] mt-11 mb-6 py-3 rounded-[23px]`}
             >
-              <Text
-                style={tw`text-center text-sm text-white font-normal`}
-              >
+              <Text style={tw`text-center text-sm text-white font-normal`}>
                 Continue
               </Text>
             </Button>
-            </View>
+          </View>
         </View>
+      </View>
+      <View style={tw`absolute -bottom-4 w-full h-full `}>
+        <Toast position={"bottom"}></Toast>
       </View>
     </ScrollView>
   );
@@ -120,7 +163,6 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    width: "full",
     borderRadius: 10,
     borderColor: "#ffffff00",
     color: "#000000",

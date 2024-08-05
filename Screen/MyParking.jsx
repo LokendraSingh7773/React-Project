@@ -20,12 +20,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Skeleton } from "@rneui/themed";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MyParking({ navigation }) {
   const [refreshing, setRefreshing] = React.useState(false);
   const [ShowParkingData, setParkingData] = useState([]);
   const [SkeletonData, setSkeletonData] = useState(1, 2, 3, 4);
   const [IsFetchedParkingData, setIsFetchedParkingData] = useState(null);
+  const customer_id = AsyncStorage.getItem("customer_id")
 
   const getParkingData = async () => {
     try {
@@ -43,7 +45,6 @@ export default function MyParking({ navigation }) {
             if (booking_list.length > 0) {
               setParkingData(booking_list);
               setIsFetchedParkingData(true);
-              console.log("The Location is")
             } else {
               setIsFetchedParkingData(message);
             }

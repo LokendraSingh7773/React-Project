@@ -23,11 +23,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ParkingDetails({ route, navigation }) {
   const { itemId } = route.params;
   const [IsFetchedParkingData, setIsFetchedParkingData] = useState("");
   const [IsShowParkingData, setIsShowParkingData] = useState([]);
+  const customer_id = AsyncStorage.getItem("customer_id")
   const GetParkingTicketData = async () => {
     try {
       setIsFetchedParkingData(false);
@@ -40,7 +42,7 @@ export default function ParkingDetails({ route, navigation }) {
         })
         .then((res) => {
           const { status_code, message, booking_details } = res.data;
-          // console.log(res.data);
+          console.log(res.data);
           if (status_code == "1") {
             setIsShowParkingData(booking_details);
             setIsFetchedParkingData(true);
@@ -57,20 +59,26 @@ export default function ParkingDetails({ route, navigation }) {
   };
 
   const share = async () => {
-    const { uri } = await FileSystem.downloadAsync(
-      "https://cdn.pixabay.com/photo/2021/12/12/16/10/qr-6865526_1280.png",
-      FileSystem.documentDirectory + "pepe.jpg"
-    );
-  //  const messageText = 'Text that you want to share goes here'
-    
+    // Download the image
+    // const { uri } = await FileSystem.downloadAsync(
+    //   "https://cdn.pixabay.com/photo/2021/12/12/16/10/qr-6865526_1280.png",
+    //   FileSystem.documentDirectory + "pepe.jpg"
+    // );
+    const messageText = `*Your Parking Station details:*
+*Click link for Parking QR Code:*
+${IsShowParkingData.qr_code}
+Start Date & Time:*${IsShowParkingData.start_date} ${IsShowParkingData.start_time}*
+End Date & Time: *${IsShowParkingData.end_date} ${IsShowParkingData.end_time}* 
+Duration:*${IsShowParkingData.parking_hours}*
+Location:https://www.google.com/maps/?q=${IsShowParkingData.latitude},${IsShowParkingData.longitude}`;
 
-    console.log("Waiting for share to resolve:");
-    await Sharing.shareAsync(uri, {
-      mimeType: "image/jpeg",
-      dialogTitle:"Share this text",
-      UTI: "JPEG",
-    });
-    console.log("File has been shared");
+    try {
+      await Share.share({
+        message: messageText,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // for location

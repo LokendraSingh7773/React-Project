@@ -19,9 +19,54 @@ import {
 import { Button } from "@rneui/themed";
 import React from "react";
 import tw from "twrnc";
+import axios from "axios";
+import Toast from "react-native-toast-message";
 
 export default function HomeScreen(props) {
   const [refreshing, setRefreshing] = React.useState(false);
+  const [FetchedTheLoginData, setFetchedTheLoginData] = useState(true);
+  const [mobile, setmobile] = useState("");
+  const [latitude, setlatitude] = useState(null);
+  const [longitude, setlongitude] = useState(null);
+  const [fcmToken, setfcmToken] = useState(null);
+
+  const SendOtpToUser = () => {
+    try {
+      setFetchedTheLoginData(false);
+      axios
+        .post("https://customer.theparkvue.com/api/customer-login", {
+          mobile: mobile,
+          latitude: latitude,
+          longitude: longitude,
+          fcmToken: fcmToken,
+        })
+        .then((res) => {
+          const { status_code, message } = res.data;
+
+          setFetchedTheLoginData(false);
+          if (status_code == "1") {
+            if (mobile.length == 10) {
+              props.navigation.navigate("OTPPage" , { UserNumber: mobile });
+            } else {
+              Toast.show({
+                type: "error",
+                text1: "Please Enter your 10 Digit Number",
+              });
+            }
+          } else {
+            Toast.show({
+              type: "error",
+              text1: message,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -49,6 +94,8 @@ export default function HomeScreen(props) {
           <Text style={styles.mobilenumber}>Enter Mobile Number</Text>
           <TextInput
             style={styles.input}
+            value={mobile}
+            onChangeText={(mobile) => setmobile(mobile)}
             placeholder="Enter number"
             placeholderTextColor="#24242480"
             keyboardType="numeric"
@@ -58,19 +105,18 @@ export default function HomeScreen(props) {
           <View>
             <Button
               accessible={false}
-              onPress={() => props.navigation.navigate("Details")}
+              onPress={SendOtpToUser}
               onSubmitEditing={Keyboard.dismiss}
               buttonStyle={tw`bg-[#25AE7A] mt-11 mb-6 py-3 rounded-[23px]`}
+              titleStyle={tw`text-sm font-normal`}
             >
-              <Text
-                showSoftInputOnFocus={false}
-                style={tw`text-center text-sm text-white font-normal`}
-              >
-                Continue
-              </Text>
+              Continue
             </Button>
           </View>
         </View>
+      </View>
+      <View style={tw`absolute -bottom-4 w-full h-full `}>
+        <Toast position={"bottom"}></Toast>
       </View>
     </ScrollView>
   );

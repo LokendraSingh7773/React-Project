@@ -1,5 +1,11 @@
 import * as React from "react";
-import { SafeAreaView, View, useWindowDimensions , BackHandler, Alert } from "react-native";
+import {
+  SafeAreaView,
+  View,
+  useWindowDimensions,
+  BackHandler,
+  Alert,
+} from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import tw from "twrnc";
 import { useEffect, useState } from "react";
@@ -11,6 +17,8 @@ import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import MapViewDirections from "react-native-maps-directions";
 import { Button } from "@rneui/themed";
+import { useFocusEffect } from "@react-navigation/native";
+
 const width = Dimensions.get("window").width;
 
 export default function TabViewExample() {
@@ -25,7 +33,7 @@ export default function TabViewExample() {
     try {
       setStationDetailsFetched(false);
       axios
-        .post("https://parkvue.microcrm.in/api/parking-stations", {
+        .post("https://customer.theparkvue.com/api/parking-stations", {
           customer_id: 0,
           vehicle_type: vehicle_type,
           latitude: lat,
@@ -35,7 +43,7 @@ export default function TabViewExample() {
         .then((res) => {
           const { status_code, message, centerList } = res.data;
           setStationDetailsFetched(true);
-
+          // console.log(res.data)
           if (status_code == "1") {
             setStationData(centerList);
             setStationsLatitude(centerList[0].latitude);
@@ -47,19 +55,19 @@ export default function TabViewExample() {
           console.error("Error fetching data: ", error);
         });
     } catch (error) {
-      console.log(err)
+      console.log(err);
     }
   };
 
-  const createTheStationRoute = (indexData) => {
-    console.log(indexData);
-    let dataArrayOfStation = stationsData.at(indexData);
+  const createTheStationRoute = (index) => {
+    const dataArrayOfStation = stationsData.at(index);
+    console.log(index);
     if (dataArrayOfStation) {
       setStationsLatitude(dataArrayOfStation.latitude);
       setStationsLongitude(dataArrayOfStation.longitude);
     }
   };
-  // useEffect(() => {}, []);
+  useEffect(() => {}, []);
 
   const layout = useWindowDimensions();
 
@@ -134,7 +142,7 @@ export default function TabViewExample() {
               </View>
               <View style={tw`flex flex-row justify-between mt-4 mx-2`}>
                 <View style={tw`flex flex-row items-center`}>
-                  <Text style={tw`text-[15px] font-medium text-[#393939] `}>
+                  <Text style={tw`text-[15px] font-medium text-[#393939]`}>
                     {item.rating}
                   </Text>
                   <FontAwesome name="star" color={"#FFBB00"} size={18} />
@@ -289,26 +297,29 @@ export default function TabViewExample() {
     getLocation();
   }, []);
 
-  useEffect(() => {
-    // const backAction = () => {
-    //   Alert.alert('Exit!', 'Are you sure you want to go back?', [
-    //     {
-    //       text: 'Cancel',
-    //       onPress: () => null,
-    //       style: 'cancel',
-    //     },
-    //     {text: 'YES', onPress: () => BackHandler.exitApp()},
-    //   ]);
-    //   return true;
-    // };
+  const backAction = () => {
+    Alert.alert("Exit!", "Are you sure you want to go back?", [
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel",
+      },
+      { text: "Exit", onPress: () => BackHandler.exitApp() },
+    ]);
+    return true;
+  };
 
-    // const backHandler = BackHandler.addEventListener(
-    //   'hardwareBackPress',
-    //   backAction,
-    // );
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener('hardwareBackPress', backAction);
 
-    // return () => backHandler.remove();/
-  }, []);
+      return () => {
+        BackHandler.removeEventListener('hardwareBackPress', backAction);
+      };
+    })
+  );
+
+  useEffect(() => {}, []);
 
   return (
     <SafeAreaView style={styles.container}>

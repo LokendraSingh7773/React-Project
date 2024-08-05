@@ -238,7 +238,7 @@ export default function MyVehicle() {
         </Text>
 
         {IsFetchedVehicledata === true ? (
-          <ScrollView style={tw`mt-4 mx-3 mb-25`}>
+          <ScrollView style={tw`mt-4 mx-3 mb-4`}>
             {showVehicle.map((item, index) => {
               return (
                 <TouchableOpacity

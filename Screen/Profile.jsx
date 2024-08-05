@@ -24,8 +24,9 @@ import {
 import tw from "twrnc";
 import axios from "axios";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function MyProfile() {
+export default function MyProfile({navigation}) {
   const [refreshing, setRefreshing] = React.useState(false);
   const [ShowProfileData, setShowProfileData] = useState([]);
   const [IsFetchedProfileData, setIsFetchedProfileData] = useState(false);
@@ -87,6 +88,8 @@ export default function MyProfile() {
   };
 
   const [isLoading, setisLoading] = useState();
+  const customer_id = AsyncStorage.getItem("customer_id")
+
 
   const ISUpdateTheProfileDetails = async () => {
     try {
@@ -96,7 +99,7 @@ export default function MyProfile() {
           "https://customer.theparkvue.com/api/update-profile",
           GetUpdateProfileData , {
             headers: {
-              customer_id: 2,
+              customer_id: customer_id,
               token:
                 "7c98a4fcb9ee1a8e6d196e846d809f65bb94355c1f2b432c4b959ea7b71e182d",
             },
@@ -234,11 +237,11 @@ export default function MyProfile() {
               </View>
             </View>
             <View>
-              <Button
+              <Button onPress={()=> navigation.navigate("GreenPassDetails")}
                 buttonStyle={tw`rounded-[9px] bg-[#13A74A] bg-opacity-15 justify-start px-4 mt-1 py-[10px]`}
               >
                 <Text style={tw`text-[#343434] font-medium`}>
-                  2 Pass available
+                 {ShowProfileData.greenPassCount} Pass available
                 </Text>
               </Button>
             </View>
