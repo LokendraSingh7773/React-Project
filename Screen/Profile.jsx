@@ -248,7 +248,7 @@ export default function MyProfile({navigation}) {
           </View>
 
           {/* Help */}
-          <TouchableOpacity
+          <TouchableOpacity onPress={()=>navigation.navigate("HelpSupport")}
             style={tw`flex flex-row items-center gap-3 mt-5 bg-white rounded-[11px] py-[15px] px-3`}
           >
             <Feather name="info" color="#6E6E6E" size={20} />
@@ -256,7 +256,7 @@ export default function MyProfile({navigation}) {
           </TouchableOpacity>
 
           {/* Privacy Policy */}
-          <TouchableOpacity
+          <TouchableOpacity onPress={()=>navigation.navigate("PrivacyPolicy")}
             style={tw`flex flex-row items-center gap-3 mt-2 bg-white rounded-[11px] py-[15px] px-3`}
           >
             <MaterialIcons name="privacy-tip" color="#6E6E6E" size={20} />
@@ -264,7 +264,7 @@ export default function MyProfile({navigation}) {
           </TouchableOpacity>
 
           {/* FAQ */}
-          <TouchableOpacity
+          <TouchableOpacity onPress={()=>navigation.navigate("FAQ")}
             style={tw`flex flex-row items-center gap-3 mt-2 bg-white rounded-[11px] py-[15px] px-3`}
           >
             <Feather name="help-circle" color="#6E6E6E" size={20} />
@@ -272,7 +272,7 @@ export default function MyProfile({navigation}) {
           </TouchableOpacity>
 
           {/* Parking History */}
-          <TouchableOpacity
+          <TouchableOpacity onPress={()=>navigation.navigate("ParkingHistory")}
             style={tw`flex flex-row items-center gap-3 mt-2 bg-white rounded-[11px] py-[15px] px-3`}
           >
             <Octicons name="history" color="#6E6E6E" size={20} />

@@ -4,13 +4,13 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  Image,
   Alert,
   Share,
   Linking,
 } from "react-native";
 import { ScrollView } from "react-native";
 import { Button, Chip, Divider } from "@rneui/themed";
+import { Image } from "expo-image";
 import {
   AntDesign,
   Feather,
@@ -29,7 +29,7 @@ export default function ParkingDetails({ route, navigation }) {
   const { itemId } = route.params;
   const [IsFetchedParkingData, setIsFetchedParkingData] = useState("");
   const [IsShowParkingData, setIsShowParkingData] = useState([]);
-  const customer_id = AsyncStorage.getItem("customer_id")
+  const customer_id = AsyncStorage.getItem("customer_id");
   const GetParkingTicketData = async () => {
     try {
       setIsFetchedParkingData(false);
@@ -128,7 +128,7 @@ Location:https://www.google.com/maps/?q=${IsShowParkingData.latitude},${IsShowPa
             </TouchableOpacity>
             <Image
               style={tw`w-[165px] h-[165px] self-center mt-2`}
-              source={require("@/assets/images/qr-code.png")}
+              source={{ uri: IsShowParkingData.qr_code }}
             />
 
             <Text
@@ -232,6 +232,8 @@ Location:https://www.google.com/maps/?q=${IsShowParkingData.latitude},${IsShowPa
                   color={
                     IsShowParkingData.booking_status == "Confirmed"
                       ? "#DAF8F0"
+                      : IsShowParkingData.booking_status == "Completed"
+                      ? "#DAF8F0"
                       : IsShowParkingData.booking_status == "Canceled"
                       ? "#ffcccb"
                       : IsShowParkingData.booking_status == "Ongoing"
@@ -242,6 +244,8 @@ Location:https://www.google.com/maps/?q=${IsShowParkingData.latitude},${IsShowPa
                   <Text
                     style={
                       IsShowParkingData.booking_status == "Confirmed"
+                        ? tw`text-[#25AE7A] text-sm font-medium`
+                        : IsShowParkingData.booking_status == "Completed"
                         ? tw`text-[#25AE7A] text-sm font-medium`
                         : IsShowParkingData.booking_status == "Canceled"
                         ? tw`text-[#f00] text-sm font-medium`

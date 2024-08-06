@@ -119,7 +119,7 @@ export default function MyVehicle() {
             });
           } else {
             Toast.show({
-              type: "success",
+              type: "error",
               text1: message,
             });
           }
@@ -454,8 +454,8 @@ export default function MyVehicle() {
             </View>
           </View>
         </BottomSheet>
-        <View style={tw`absolute -bottom-4 w-full h-full `}>
-          <Toast position={"bottom"}></Toast>
+        <View style={tw`absolute top-1 w-full h-full `}>
+          <Toast position={"top"}></Toast>
         </View>
       </ScrollView>
     </>

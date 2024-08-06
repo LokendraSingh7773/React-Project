@@ -7,7 +7,7 @@ import tw from "twrnc";
 import { Button } from "@rneui/themed";
 import { AntDesign } from "@expo/vector-icons";
 
-export default function ShareData() {
+export default function FAQ({ navigation }) {
   const [FetchedSupportQuery, setFetchedSupportQuery] = useState("");
   const [ShowSupportQuery, setShowSupportQuery] = useState([]);
 
@@ -76,14 +76,32 @@ export default function ShareData() {
           </Button>
           <Text style={tw`text-white font-semibold text-base`}>FAQ</Text>
         </View>
-        <View style={tw`mt-3 mx-2`}>
-        <AccordionList
-          list={ShowSupportQuery}
-          header={_head}
-          body={_body}
-          keyExtractor={(item) => `${item.id}`}
-        />
-        </View>
+        {FetchedSupportQuery === true ? (
+          <View style={tw`mt-3 mx-2`}>
+            <AccordionList
+              list={ShowSupportQuery}
+              header={_head}
+              body={_body}
+              keyExtractor={(item) => `${item.id}`}
+            />
+          </View>
+        ) : (
+          <View style={tw`items-center h-full mt-10`}>
+            <Button
+              style={tw`text-center justify-center items-center`}
+              type="Clear"
+              loadingProps={{
+                size: "50px",
+                color: "#084b82",
+              }}
+              loadingStyle={tw`text-xl`}
+              loading
+            ></Button>
+            <Text style={tw`text-center text-[#084b82] text-base ml-2`}>
+              Loading..
+            </Text>
+          </View>
+        )}
       </SafeAreaView>
     </>
   );

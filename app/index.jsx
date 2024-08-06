@@ -22,6 +22,10 @@ import {
   AntDesign,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
+import ParkingHistory from "@/Screen/ParkingHistory";
+import FAQ from "@/Screen/FAQ";
+import PrivacyPolicy from "@/Screen/PrivacyPolicy";
+import HelpSupport from "@/Screen/HelpSupport";
 
 function Tabnavigation() {
   return (
@@ -95,7 +99,7 @@ const Tab = createBottomTabNavigator();
 function App() {
   return (
     <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName="MainDesign">
+      <Stack.Navigator initialRouteName="Profile">
         <Stack.Screen
           name="MainDesign"
           component={Tabnavigation}
@@ -129,6 +133,26 @@ function App() {
         <Stack.Screen
           name="GreenPassDetails"
           component={GreenPassDetails}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+          name="HelpSupport"
+          component={HelpSupport}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+          name="PrivacyPolicy"
+          component={PrivacyPolicy}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+          name="FAQ"
+          component={FAQ}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+          name="ParkingHistory"
+          component={ParkingHistory}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
