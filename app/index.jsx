@@ -99,7 +99,7 @@ const Tab = createBottomTabNavigator();
 function App() {
   return (
     <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName="Profile">
+      <Stack.Navigator initialRouteName="MainDesign">
         <Stack.Screen
           name="MainDesign"
           component={Tabnavigation}

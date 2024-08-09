@@ -264,7 +264,7 @@ export default function MyProfile({navigation}) {
           </TouchableOpacity>
 
           {/* FAQ */}
-          <TouchableOpacity onPress={()=>navigation.navigate("FAQ")}
+          <TouchableOpacity onPress={()=>navigation.navigate("ShareDetails")}
             style={tw`flex flex-row items-center gap-3 mt-2 bg-white rounded-[11px] py-[15px] px-3`}
           >
             <Feather name="help-circle" color="#6E6E6E" size={20} />

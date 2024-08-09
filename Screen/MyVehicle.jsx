@@ -97,7 +97,6 @@ export default function MyVehicle() {
       axios
         .post("https://customer.theparkvue.com/api/add-vehicle", vehicleData, {
           headers: {
-            customer_id: 1,
             token:
               "0bd480dc4cf9949c6d0f878e3ee186bd8bd3cc41864ee63a7174c0bbec16e839",
           },

@@ -1,5 +1,4 @@
 import { Image, StyleSheet, Platform, ScrollView } from "react-native";
-import { Keyboard } from "react-native";
 import { useState } from "react";
 import { Text, View, RefreshControl } from "react-native";
 import { OtpInput } from "react-native-otp-entry";
@@ -31,6 +30,10 @@ export default function HomeScreen({ route, navigation }) {
           if (status_code == "1") {
             AsyncStorage.setItem("customer_id", customer_id);
             navigation.navigate("MainDesign");
+            Toast.show({
+              type: "success",
+              text1: message,
+            });
           } else if (status_code == "2") {
             AsyncStorage.setItem("customer_id", customer_id);
             navigation.navigate("LoginProfilePage");
@@ -60,8 +63,6 @@ export default function HomeScreen({ route, navigation }) {
       setRefreshing(false);
     }, 2000);
   }, []);
-
-  Keyboard.dismiss();
 
   return (
     <ScrollView
@@ -101,6 +102,7 @@ export default function HomeScreen({ route, navigation }) {
             </Text>
           </View>
           <OtpInput
+          autoFocus={false}
             numberOfDigits={4}
             focusColor="green"
             value={userOTP}

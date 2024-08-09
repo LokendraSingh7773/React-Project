@@ -9,25 +9,22 @@ import {
 } from "react-native";
 import { StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import LinearGradient from "react-native-linear-gradient";
-import { RefreshControl } from "react-native";
 import { AntDesign, EvilIcons, FontAwesome5 } from "@expo/vector-icons";
 import tw from "twrnc";
 import { Chip } from "@rneui/base";
 import { Button } from "@rneui/themed";
 import axios from "axios";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Skeleton } from "@rneui/themed";
+import { Skeleton, Overlay } from "@rneui/themed";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Rating, AirbnbRating } from "react-native-ratings";
+import Textarea from "react-native-textarea";
 
 export default function MyParking({ navigation }) {
-  const [refreshing, setRefreshing] = React.useState(false);
   const [ShowParkingData, setParkingData] = useState([]);
-  const [SkeletonData, setSkeletonData] = useState(1, 2, 3, 4);
   const [IsFetchedParkingData, setIsFetchedParkingData] = useState(null);
   const customer_id = AsyncStorage.getItem("customer_id");
+  const [visible, setVisible] = useState(false);
 
   const getParkingData = async () => {
     try {
@@ -41,7 +38,7 @@ export default function MyParking({ navigation }) {
         })
         .then((res) => {
           const { booking_list, message, status_code } = res.data;
-          console.log(res.data);
+          // console.log(res.data);
           if (status_code == "1") {
             if (booking_list.length > 0) {
               setParkingData(booking_list);
@@ -65,12 +62,78 @@ export default function MyParking({ navigation }) {
     }
   };
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, []);
+  const toggleOverlay = () => {
+    setVisible(!visible);
+  };
+
+  const [IsLoading, setIsLoading] = useState(false);
+  const [rating, setrating] = useState(null);
+  const [booking_id, setBookingId] = useState(null);
+  const [station_id, setstation_id] = useState(null);
+  const [comment, setcomment] = useState(null);
+  const GetDataByReview = (item) => {
+    setstation_id(item.station_id);
+    setBookingId(item.parking_id);
+    toggleOverlay();
+  };
+
+  const ratingCompleted = (rating) => {
+    console.log("Rating is: " + rating);
+    setrating(rating);
+  };
+
+  const reviewData = {
+    customer_id: 2,
+    rating: rating,
+    booking_id: booking_id,
+    station_id: station_id,
+    comment: comment,
+    is_cancle: 0,
+  };
+
+  const ParkingReview = () => {
+    try {
+      setIsLoading(true);
+      axios
+        .post(
+          "https://customer.theparkvue.com/api/add-customer-review",
+          reviewData,
+          {
+            headers: {
+              token:
+                "7c98a4fcb9ee1a8e6d196e846d809f65bb94355c1f2b432c4b959ea7b71e182d",
+            },
+          }
+        )
+        .then((res) => {
+          const { status, message } = res.data;
+          console.log(res.data);
+          setIsLoading(false);
+          if (status === true) {
+            toggleOverlay(false);
+            setcomment(null);
+            setrating(null);
+            getParkingData();
+            Toast.show({
+              type: "success",
+              text1: message,
+            });
+          } else {
+            Toast.show({
+              type: "error",
+              text1: message,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // for review
 
   // for location
   const openGoogleMaps = (item) => {
@@ -122,7 +185,7 @@ export default function MyParking({ navigation }) {
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    navigation.navigate("Park", { itemId: item.parking_id});
+                    navigation.navigate("Park", { itemId: item.parking_id });
                   }}
                 >
                   <View style={tw`bg-white mx-4 px-3 mb-3 rounded-[11px] py-3`}>
@@ -229,7 +292,13 @@ export default function MyParking({ navigation }) {
                     </View>
                     <View style={tw`flex flex-row gap-3 mt-2`}>
                       {item.customerGivenReview == 0 ? (
-                        <Button radius={"md"} type="clear">
+                        <Button
+                          onPress={() => {
+                            GetDataByReview(item);
+                          }}
+                          radius={"md"}
+                          type="clear"
+                        >
                           Review Station
                         </Button>
                       ) : null}
@@ -382,6 +451,60 @@ export default function MyParking({ navigation }) {
         <View style={tw`absolute -bottom-4 w-full h-full `}>
           <Toast position={"bottom"}></Toast>
         </View>
+
+        <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
+          <View style={tw`w-full items-center text-center py-4 px-4 relative`}>
+            <Image
+              style={tw`w-[100px] h-[100px] absolute rounded-full p-1 -top-14 bg-[#fff]`}
+              source={require("../assets/images/rate.png")}
+            />
+            <Text
+              style={tw`text-lg text-center font-medium leading-tight mt-6`}
+            >
+              {" "}
+              How Would You Rate Our {"\n"} Parking Station?
+            </Text>
+            <AirbnbRating
+              count={5}
+              reviews={
+                ratingCompleted.rating
+                  ? "Hello"
+                  : ["Bad", "OK", "Good", "Very Good", "Amazing"]
+              }
+              defaultRating={0}
+              defaultValue={0}
+              reviewSize={20}
+              onFinishRating={ratingCompleted}
+              size={25}
+            />
+            <Textarea
+              containerStyle={tw`h-[100px] w-[300px] rounded-[10px] mt-4 text-base text-[#000] border-[1px] border-[#ccc] px-2 py-1`}
+              defaultValue={reviewData.comment}
+              onChangeText={(value) => setcomment(value)}
+              maxLength={150}
+              placeholder="Enter Here"
+              placeholderTextColor={"#24242480"}
+              underlineColorAndroid={"transparent"}
+            />
+            <View style={tw`flex flex-row gap-6 mt-5`}>
+              <Button
+                title="Cancel"
+                color={"#DAF8F0"}
+                titleStyle={tw`text-[#25AE7A] px-3`}
+                radius={"md"}
+                onPress={toggleOverlay}
+              />
+              <Button
+                loading={IsLoading}
+                title="Submit"
+                radius={"md"}
+                titleStyle={tw`px-3`}
+                color={"#25AE7A"}
+                onPress={ParkingReview}
+              />
+            </View>
+          </View>
+        </Overlay>
       </SafeAreaView>
     </>
   );
@@ -391,5 +514,15 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     height: "100%",
+  },
+  textPrimary: {
+    marginVertical: 20,
+    textAlign: "center",
+    fontSize: 20,
+  },
+  textSecondary: {
+    marginBottom: 10,
+    textAlign: "center",
+    fontSize: 17,
   },
 });

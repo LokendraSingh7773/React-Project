@@ -10,6 +10,7 @@ import { AntDesign } from "@expo/vector-icons";
 export default function FAQ({ navigation }) {
   const [FetchedSupportQuery, setFetchedSupportQuery] = useState("");
   const [ShowSupportQuery, setShowSupportQuery] = useState([]);
+  
 
   const GetSupportQueries = () => {
     try {
@@ -44,7 +45,7 @@ export default function FAQ({ navigation }) {
     return (
       <View bordered style={tw`mx-3`}>
         <Text
-          style={tw`bg-[#fff] mt-2 w-full py-3 px-2 rounded-[6px] text-base font-semibold`}
+          style={tw`bg-[#fff] mt-2 w-full py-3 px-2 rounded-t-[6px] text-base font-semibold`}
         >
           {item.question}
         </Text>
@@ -54,7 +55,7 @@ export default function FAQ({ navigation }) {
 
   const _body = (item) => {
     return (
-      <View bordered style={tw`bg-white mx-3`}>
+      <View bordered style={tw`bg-white mx-3 pb-1 rounded-b-[6px]`}>
         <Text style={tw`px-2 py-1`}>{item.answer}</Text>
       </View>
     );

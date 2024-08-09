@@ -22,7 +22,7 @@ import { useFocusEffect } from "@react-navigation/native";
 const width = Dimensions.get("window").width;
 
 export default function TabViewExample() {
-  const GOOGLE_MAPS_APIKEY = "AIzaSyCIty6mcdUJPR_VOSP5vCjWp5ZoDQbEqXw";
+  const GOOGLE_MAPS_APIKEY = "AIzaSyDRmxwmrjkF-RN5vVWJJws8QFGOsDlden8";
 
   const [stationsData, setStationData] = useState([]);
   const [stationsLatitude, setStationsLatitude] = useState(0);
@@ -43,12 +43,12 @@ export default function TabViewExample() {
         .then((res) => {
           const { status_code, message, centerList } = res.data;
           setStationDetailsFetched(true);
-          // console.log(res.data)
+          console.log(res.data);
           if (status_code == "1") {
             setStationData(centerList);
             setStationsLatitude(centerList[0].latitude);
             setStationsLongitude(centerList[0].longitude);
-            console.log(stationsLatitude);
+            console.log(stationsLatitude, stationsLongitude);
           }
         })
         .catch((error) => {
@@ -60,14 +60,13 @@ export default function TabViewExample() {
   };
 
   const createTheStationRoute = (index) => {
-    const dataArrayOfStation = stationsData.at(index);
+    const dataArrayOfStation = stationsData[index];
     console.log(index);
     if (dataArrayOfStation) {
       setStationsLatitude(dataArrayOfStation.latitude);
       setStationsLongitude(dataArrayOfStation.longitude);
     }
   };
-  useEffect(() => {}, []);
 
   const layout = useWindowDimensions();
 
@@ -311,10 +310,10 @@ export default function TabViewExample() {
 
   useFocusEffect(
     React.useCallback(() => {
-      BackHandler.addEventListener('hardwareBackPress', backAction);
+      BackHandler.addEventListener("hardwareBackPress", backAction);
 
       return () => {
-        BackHandler.removeEventListener('hardwareBackPress', backAction);
+        BackHandler.removeEventListener("hardwareBackPress", backAction);
       };
     })
   );
@@ -343,25 +342,22 @@ export default function TabViewExample() {
                 />
               );
             })}
-          {stationDetailsFetched == true &&
-            stationsData.map((item, index) => {
-              return (
-                <MapViewDirections
-                  key={index}
-                  origin={{
-                    latitude: 26.91071756609974,
-                    longitude: 75.78035792542063,
-                  }}
-                  destination={{
-                    latitude: parseFloat(stationsLatitude),
-                    longitude: parseFloat(stationsLongitude),
-                  }}
-                  strokeWidth={4}
-                  apikey={GOOGLE_MAPS_APIKEY}
-                  strokeColor="#256db5"
-                />
-              );
-            })}
+          {stationDetailsFetched == true ? (
+            <MapViewDirections
+              key={index}
+              origin={{
+                latitude: 26.91071756609974,
+                longitude: 75.78035792542063,
+              }}
+              destination={{
+                latitude: parseFloat(stationsLatitude),
+                longitude: parseFloat(stationsLongitude),
+              }}
+              strokeWidth={4}
+              apikey={GOOGLE_MAPS_APIKEY}
+              strokeColor="#256db5"
+            />
+          ) : null}
         </MapView>
       )}
       <TabView
